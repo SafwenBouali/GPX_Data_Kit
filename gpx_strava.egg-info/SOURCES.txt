@@ -1,0 +1,8 @@
+README.md
+setup.py
+gpx_strava/GPX_Data_Kit.py
+gpx_strava/__init__.py
+gpx_strava.egg-info/PKG-INFO
+gpx_strava.egg-info/SOURCES.txt
+gpx_strava.egg-info/dependency_links.txt
+gpx_strava.egg-info/top_level.txt
