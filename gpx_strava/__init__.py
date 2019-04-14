@@ -7,6 +7,9 @@ import xml.dom.minidom
 import random
 import geopy.distance
 from xml.dom import minidom
+import copy
+
+
 
 
 class activity:
@@ -31,7 +34,12 @@ class activity:
         return
     
     def __compare_speed(pt_1,pt_2,speed):
-        print('not implemented')
+        """return true if the calculated speed is less than the threshold, false otherwise."""
+        
+        coords_1 = (float(pt_1.attrib['lat']), float(pt_1.attrib['lon']))
+        coords_2 = (float(pt_2.attrib['lat']), float(pt_2.attrib['lon']))
+
+        return (geopy.distance.vincenty(coords_1, coords_2).m<(speed*25.0/90.0))
     
     def __parse_gpx(data_source):
         """given gpx data, a string, it parses the data
@@ -113,8 +121,11 @@ class activity:
                 self.crop(crop_threshold_speed)
         
     
-    def crop(self,speed_threshold=10.0):
-        print('not implemented')
+    def crop(self,speed_threshold):
+        while(activity.__compare_speed(self.trk_points[0],self.trk_points[1],speed_threshold)):
+            del(self.trk_points[0])
+        while(activity.__compare_speed(self.trk_points[-1],self.trk_points[-2],speed_threshold)):
+            del(self.trk_points[-1])
     
     
     def stitch(activities):
@@ -132,5 +143,14 @@ class activity:
 
 
     def join(activities):
-        print('not implemented')
+        
+        first_stamp = activities[0].first_stamp
+        root_node = activities[0].__root_node
+        trk_points = []
+        last_total = 0
+        for i in range(len(activities)):
+            activities[i].add_seconds((activities[i].first_stamp-first_stamp).total_seconds())
+            trk_points.extend(activities[i].trk_points)
+        #last_total data is wrong
+        return activity((first_stamp,trk_points,root_node,last_total),data_type="ready")
     
