@@ -1,14 +1,10 @@
-name = "gpx_strava"
-
 import xml.etree.ElementTree as ET
 from datetime import datetime,timedelta
 import dateutil.parser
 import xml.dom.minidom
 import random
 import geopy.distance
-from xml.dom import minidom
-import copy
-
+import os
 
 
 
@@ -141,7 +137,6 @@ class activity:
         return activity((first_stamp,trk_points,root_node,last_total),data_type="ready")
 
 
-
     def join(activities):
         
         first_stamp = activities[0].first_stamp
@@ -151,6 +146,17 @@ class activity:
         for i in range(len(activities)):
             activities[i].add_seconds((activities[i].first_stamp-first_stamp).total_seconds())
             trk_points.extend(activities[i].trk_points)
-        #last_total data is wrong
         return activity((first_stamp,trk_points,root_node,last_total),data_type="ready")
+    
+    def read_all(crop_threshold_speed = 10):
+        
+        activities = []
+        for file in os.listdir():
+            if file.endswith(".gpx"):
+                activities.append(activity(open(file).read(),crop_threshold_speed))
+        activities.sort(key=lambda x: x.first_stamp)
+        if(len(activities) is 0):
+            print("no activities found.")
+        else:
+            return activities
     
