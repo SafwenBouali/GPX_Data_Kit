@@ -11,6 +11,21 @@ import os
 class activity:
     """An activity object with all the necessary operations"""
     
+    
+    def __fake_route_to_gpx(data,date=None):
+        """adding timestamps to empty route file"""
+        i = 0
+        res = ''
+        data = data.split('</trkpt>')
+        if(date is None):
+            date = datetime.now() - timedelta(days=1)
+        for element in data:
+            i = i + 1
+            res += element.replace('</ele>','</ele>\n<time>'
+                                   + activity.__datetime_converter(date + timedelta(seconds=i*10))
+                                   + '</time>\n</trkpt>\n')
+        return res
+    
     def __datetime_converter(timestamp,to_string=True):
         """if the 'to_string' variable is true, it converts a datetime object
         to a string in the ISO 8601 format with a 'T' as a delimiter.
@@ -103,7 +118,10 @@ class activity:
         if (data_type is 'ready'):
             data = data_source
         else:
-            if (data_type is 'file'):
+            if (data_type is 'route'):
+                data = open(data_source).read()
+                data = activity.__fake_route_to_gpx(data)
+            elif (data_type is 'file'):
                 data = open(data_source).read()
             else:
                 data = data_source
